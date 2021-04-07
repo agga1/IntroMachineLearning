@@ -7,58 +7,51 @@ from sklearn import metrics
 from DataGenerator import load_data_from_image
 import pandas as pd
 
-cmap = ListedColormap(['#FF00BD', '#F2CA19', '#0000FF'])
-
 def main():
     dataset = load_data_from_image('set2.png', 800)
-    X, y = dataset
-    split_data = train_test_split(X, y, test_size=.4, random_state=42)
-    classifiers = [
-        KNeighborsClassifier(1, metric='euclidean'),
-        KNeighborsClassifier(13, metric='euclidean'),
-        KNeighborsClassifier(1, algorithm='brute', metric='mahalanobis', metric_params={'V': np.cov(split_data[1])}),
-        KNeighborsClassifier(9, weights='distance', metric='euclidean'),
-    ]
-    fig, ax, mesh = initialize_display(len(classifiers)+1, dataset)
 
-    plot_classifiers(classifiers, split_data, mesh, ax)
+    clf1_kwargs = {'metric': 'euclidean'}
+    clf2_kwargs = {'metric': 'euclidean', 'weights': 'distance'}
+    clfs_kwargs = [clf1_kwargs, clf2_kwargs]
+    for clf_kwargs in clfs_kwargs:
+        mean, std = evaluate_clf_params(dataset, **clf_kwargs)
+        print(mean, std)
 
-    plt.show()
+def evaluate_clf_params(dataset, repeat=16, **clf_kwargs):
+    accuracies = []
+    for i in range(repeat):
+        X, y = dataset
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2, random_state=42)
+        k = find_best_k(X_train, y_train, **clf_kwargs)
+        acc = get_accuracy(X_train, X_test, y_train, y_test, k, **clf_kwargs)
+        accuracies.append(acc)
+        print(k)
+    series = pd.Series(data=accuracies)
+    print(series)
+    return series.mean(), series.std()
 
-def initialize_display(rows, dataset):
-    """ prepare axes, mesh and display original dataset on the first axis. """
-    fig, ax = plt.subplots(rows, 1, figsize=(20, 20))
-    mesh = get_mesh(dataset)
-    display(dataset, mesh, ax[0])
-    return fig, ax, mesh
+def find_best_k(X, y, **clf_kwargs):
+    max_acc = 0
+    max_ind = -1
+    for k in range(1, 21):
+        acc = get_avg_accuracy(k, X, y, **clf_kwargs)
+        if acc > max_acc:
+            max_ind = k
+            max_acc = acc
+    return max_ind
 
-def get_mesh(dataset, h=1.):
-    X = dataset[0]
-    x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
-    y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
-                         np.arange(y_min, y_max, h))
-    return xx, yy
+def get_avg_accuracy(k, X, y, repeat=16, **clf_kwargs):
+    results = []
+    for i in range(repeat):
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.2)
+        accuracy = get_accuracy(X_train, X_test, y_train, y_test, k, **clf_kwargs)
+        results.append(accuracy)
+    return sum(results)/len(results)
 
-def display(dataset, mesh, axis):
-    X, y = dataset
-    axis.scatter(X[:, 0], X[:, 1], marker='o', c=y, cmap=cmap)
-    axis.set_xlim(mesh[0].min(), mesh[0].max())
-    axis.set_ylim(mesh[1].min(), mesh[1].max())
-    axis.set_aspect(1)
-
-def plot_classifiers(classifiers, split_data, mesh, axes):
-    X_train, X_test, y_train, y_test = split_data
-    for idx, cls in enumerate(classifiers):
-        cls.fit(X_train, y_train)
-        y_pred = cls.predict(X_test)
-        print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
-        z = cls.predict(np.c_[mesh[0].ravel(), mesh[1].ravel()])
-        z = z.reshape(mesh[0].shape)
-        axes[idx+1].contourf(mesh[0], mesh[1], z, cmap=cmap, alpha=.5)
-        display((X_train, y_train), mesh, axes[idx+1])
-
-
-
+def get_accuracy(X_train, X_test, y_train, y_test, k, **clf_kwargs):
+    classifier = KNeighborsClassifier(k, **clf_kwargs)
+    classifier.fit(X_train, y_train)
+    y_pred = classifier.predict(X_test)
+    return metrics.accuracy_score(y_test, y_pred)
 
 main()
