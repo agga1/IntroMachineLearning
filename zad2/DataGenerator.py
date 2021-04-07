@@ -9,10 +9,9 @@ BLUE = ( 63,  72, 204)
 color_to_class = {RED: 0, GREEN: 1, BLUE: 2}
 
 def load_data_from_image(filename, size=None):
-    image = Image.open(filename)
-    image.convert('RGB')
+    image = Image.open(filename).convert('RGB')
     data = np.asarray(image)
-    print(data.shape)
+    print("shape:", data.shape)
     all_points = []
     for x in range(data.shape[0]):
         for y in range(data.shape[1]):
@@ -35,9 +34,8 @@ def to_standardized_notation(dataset):
     Y = np.array([elem[1] for elem in dataset])
     return X,Y
 
-dataset = load_data_from_image('set.png', 1000)
-# print(dataset)
-# X1, Y1 = dataset
-# plt.scatter(X1[:, 0], X1[:, 1], marker='o', c=Y1,
-#             edgecolor='k')
-# plt.show()
+
+
+
+# dataset = load_data_from_image('set.png', 1000)
+# display(dataset)

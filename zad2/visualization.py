@@ -1,6 +1,5 @@
-from DataGenerator import dataset
+from DataGenerator import load_data_from_image
 
-print(__doc__)
 
 
 # Code source: Gaël Varoquaux
@@ -26,7 +25,7 @@ names = ["Nearest Neighbors 1", "Nearest Neighbors 1","Nearest Neighbors 1"]
 
 
 datasets = [
-    dataset,
+    load_data_from_image('set.png', 500),
             ]
 
 
@@ -44,7 +43,7 @@ for ds_cnt, ds in enumerate(datasets):
     y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
     xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
                          np.arange(y_min, y_max, h))
-    print("xxyy",xx, yy)
+    # print("xxyy",xx, yy)
 
     # just plot the dataset first
     ax = plt.subplot(len(datasets), len(classifiers) + 1, i)
@@ -77,6 +76,7 @@ for ds_cnt, ds in enumerate(datasets):
 
         # Put the result into a color plot
         Z = Z.reshape(xx.shape)
+        print(Z)
         ax.contourf(xx, yy, Z, alpha=.8)
 
         # Plot the training points
