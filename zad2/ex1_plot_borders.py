@@ -7,7 +7,7 @@ from DataGenerator import load_data_from_image
 cmap = ListedColormap(['#FF00BD', '#F2CA19', '#0000FF'])
 
 def main():
-    dataset = load_data_from_image('set2.png', 600)
+    dataset = load_data_from_image('set.png', 750)
     classifiers = [
         KNeighborsClassifier(1, metric='euclidean'),
         KNeighborsClassifier(13, metric='euclidean'),

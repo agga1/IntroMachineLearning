@@ -11,7 +11,7 @@ color_to_class = {RED: 0, GREEN: 1, BLUE: 2}
 def load_data_from_image(filename, size=None):
     image = Image.open(filename).convert('RGB')
     data = np.asarray(image)
-    print("shape:", data.shape)
+    # print("shape:", data.shape)
     all_points = []
     for x in range(data.shape[0]):
         for y in range(data.shape[1]):
