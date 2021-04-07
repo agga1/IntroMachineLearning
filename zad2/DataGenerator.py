@@ -33,9 +33,3 @@ def to_standardized_notation(dataset):
     X = np.array([elem[0] for elem in dataset])
     Y = np.array([elem[1] for elem in dataset])
     return X,Y
-
-
-
-
-# dataset = load_data_from_image('set.png', 1000)
-# display(dataset)
