@@ -51,7 +51,5 @@ def plot_classifiers(classifiers, dataset, mesh, axes):
         axes[idx+1].contourf(mesh[0], mesh[1], z, cmap=cmap, alpha=.5)
         display((X, y), mesh, axes[idx+1])
 
-
-
-
-main()
+if __name__ == "__main__":
+    main()
