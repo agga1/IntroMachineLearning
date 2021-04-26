@@ -43,9 +43,9 @@ def visualize_components(components, variances):
     print("components shape:", components.shape)
     scaler = MinMaxScaler(feature_range=(0, 255))
     scaled = scaler.fit_transform(components)
-    asint = np.rint(scaled)
-    for row in range(asint.shape[0]):
-        vector_to_image(asint[row], "comps.png", title=f"var={variances[row]}", show=False) # todo show True
+    scaled_int = np.rint(scaled)
+    for row in range(scaled_int.shape[0]):
+        vector_to_image(scaled_int[row], "comps.png", title=f"var={variances[row]}")
     pass
 
 def apply_pca(dataset, *args, **kwargs):
@@ -74,7 +74,6 @@ def visualize_2d(dataset, labels):
     df = pd.DataFrame(new_images, columns=['x', 'y'])
     df['labels'] = [label_to_ordinal[label] for label in labels]
     print(df)
-    # df.plot(x='x', y='y', style='.', c=df['labels'])
     plt.scatter(df.x, df.y, c=df.labels, edgecolors='black', cmap=ListedColormap(['#FF00BD', '#F2CA19', '#0000FF']))
     plt.show()
     print("reduced dataset shape:", new_images.shape)
